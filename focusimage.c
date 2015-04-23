@@ -1,10 +1,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <netpbm/pam.h>
+#include <pam.h>
 
 #include "bayer.h"
 
+#if !defined(PAM_STRUCT_SIZE)
+#define PAM_MEMBER_OFFSET(mbrname) \
+  ((size_t)(unsigned long)(char*)&((struct pam *)0)->mbrname)
+#define PAM_MEMBER_SIZE(mbrname) \
+  sizeof(((struct pam *)0)->mbrname)
+#define PAM_STRUCT_SIZE(mbrname) \
+  (PAM_MEMBER_OFFSET(mbrname) + PAM_MEMBER_SIZE(mbrname))
+#endif
 
 /* BAYER RGGB */
 static const int my_bayer[] = {0, 1, 1, 2};
