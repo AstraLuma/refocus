@@ -510,8 +510,8 @@ refocus(unsigned char *img_data, int width, int height, float focus)
       {
         for (sx=0; sx<new_w; sx++)
         {
-          nx = sx + dx;
-          ny = sy + dy;
+          nx = sx + idx;
+          ny = sy + idy;
           if ((nx >= 0)&&(nx < new_w)&&(ny >= 0)&&(ny < new_h))
           {
             indx = (ny * new_w * 3) + (nx * 3);
@@ -650,42 +650,29 @@ focus_image(unsigned short *idata, int width, int height, float focus)
    * towards the camera is focus = -1 moving again towards zero, but
    * from the negative side.
    */
-  ref_img = refocus(smash_img, width, height, focus);
-  free(smash_img);
-  width = width / 10;
-  height = height / 10;
-
-  writepnm(ref_img, width, height, 0);
-  free(ref_img);
-
+    ref_img = refocus(smash_img, width, height, focus);
+    writepnm(ref_img, width / 10, height / 10, 0);
+    free(ref_img);
 #ifdef MULTI
 {
+  float f_array[] = {0.09, 0.11, 0.15, 0.19, 0.25, 0.35, 0.5, 0.7, 0.9, 1.0,
+        -1.0, -0.8, -0.6, -0.48, -0.38, -0.28, -0.19, -0.11, -0.9, -0.07};
   int cnt;
   float f1;
+  int i;
 
   cnt = 10;
-  f1 = 0.1;
-  while (f1 < 1.09)
+  for (i=0; i<20; i++)
   {
+    f1 = f_array[i];
+fprintf(stderr, "At %d focus = %f\n", cnt, f1);
     ref_img = refocus(smash_img, width, height, f1);
-  
     writepnm(ref_img, width / 10, height / 10, cnt);
     free(ref_img);
     cnt++;
-    f1 = f1 + 0.1;
   }
-  f1 = -1.0;
-  while (f1 <= -0.09)
-  {
-    ref_img = refocus(smash_img, width, height, f1);
-  
-    writepnm(ref_img, width / 10, height / 10, cnt);
-    free(ref_img);
-    cnt++;
-    f1 = f1 + 0.1;
-  }
-  free(smash_img);
 }
-#endif
+#endif /* MULTI */
+  free(smash_img);
 }
 
